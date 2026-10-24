@@ -70,7 +70,11 @@
   </div>
   </div><div class="row">
   <div class="col-xs-6 text-center lead">
-    <strong>{{ session.jumble }}</strong>
+    <strong>
+      {% for letter in session.jumble %}
+      <span class="jumble-letter">{{ letter }}</span>
+      {% endfor %}
+    </strong>
   </div>
   </div><div class="row">
   <div class="col-xs-6 text-center">
@@ -127,6 +131,15 @@ $("#attempt").keyup(function(event) {
                   }
                   else {
                     $(this).removeClass("highlight");
+                  }
+                });
+                $(".jumble-letter").each(function() {
+                  if(result.filtered_text.includes($(this).text())){
+                    $(this).addClass("grayed-out");
+                    result.filtered_text = result.filtered_text.replace($(this).text(), "");
+                  }
+                  else {
+                    $(this).removeClass("grayed-out");
                   }
                 });
                }
