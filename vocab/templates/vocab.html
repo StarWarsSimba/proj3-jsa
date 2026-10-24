@@ -54,7 +54,7 @@
   -->
 <div class="row">
   {% for word in g.vocab %}
-    <div class="col-xs-2 text-center"> {{ word }} </div>
+    <div class="col-xs-2 text-center vocab-word">{{ word }}</div>
     {% if loop.index is divisibleby 3 %}
     </div> <!-- row -->
     <div class="row">
@@ -112,15 +112,23 @@ $("#attempt").keyup(function(event) {
               function(data) {
                 result = data.result;
                 console.log(result);
-                $("#attempt").val(result.filtered_text);
                 $("#alert").html(result.alert);
                 $("#results").html(result.matches.join(' '));
                 if(result.found) {
-                  $("#attempt").val('');
+                  result.filtered_text = "";
                 }
+                $("#attempt").val(result.filtered_text);
                 if(result.complete) {
                   window.location.href = "/success";
                 }
+                $(".vocab-word").each(function() {
+                  if($(this).text().startsWith(result.filtered_text) && result.filtered_text != ""){
+                    $(this).addClass("highlight");
+                  }
+                  else {
+                    $(this).removeClass("highlight");
+                  }
+                });
                }
            );
    });

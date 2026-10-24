@@ -13,3 +13,7 @@
 .message { 
     color: red;
 }
+
+.highlight {
+    background-color: yellow;
+}
