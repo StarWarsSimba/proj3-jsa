@@ -79,24 +79,29 @@ def ajaxcheck():
     matches = flask.session.get("matches", [])  # Default to empty list
 
     # Is it good?
+    filtered_text = ""
+    for letter in text:
+        if LetterBag(jumble).contains(filtered_text + letter):
+            filtered_text += letter
     in_jumble = LetterBag(jumble).contains(text)
     matched = WORDS.has(text)
-    message = {"matches": matches, "alert": "", "found": False}
+    message = {"matches": matches, "alert": "", "found": False, "filtered_text": filtered_text}
     # Respond appropriately
-    if matched and in_jumble and not (text in matches):
-        # Cool, they found a new word
-        matches.append(text)
-        flask.session["matches"] = matches
-        message["found"] = True
-    elif text in matches:
-        message["alert"] = "You already found {}".format(text)
-    elif not matched and text:
-        message["alert"] = "{} isn't in the list of words".format(text)
-    elif not in_jumble and text:
-        message["alert"] = '"{}" can\'t be made from the letters {}'.format(text, jumble)
-    elif text:
-        app.logger.debug("This case shouldn't happen!")
-        assert False  # Raises AssertionError
+    if in_jumble:
+        if matched and not (text in matches):
+            # Cool, they found a new word
+            matches.append(text)
+            flask.session["matches"] = matches
+            message["found"] = True
+        elif text in matches:
+            message["alert"] = "You already found {}".format(text)
+        elif not matched and text:
+            message["alert"] = "{} isn't in the list of words".format(text)
+        elif not in_jumble and text:
+            message["alert"] = '"{}" can\'t be made from the letters {}'.format(text, jumble)
+        elif text:
+            app.logger.debug("This case shouldn't happen!")
+            assert False  # Raises AssertionError
 
 
     if len(matches) >= flask.session["target_count"]:

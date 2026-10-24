@@ -112,6 +112,7 @@ $("#attempt").keyup(function(event) {
               function(data) {
                 result = data.result;
                 console.log(result);
+                $("#attempt").val(result.filtered_text);
                 $("#alert").html(result.alert);
                 $("#results").html(result.matches.join(' '));
                 if(result.found) {
