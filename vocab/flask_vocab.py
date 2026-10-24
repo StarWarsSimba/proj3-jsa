@@ -72,7 +72,38 @@ def success():
 #   You'll need to change this to a
 #   a JSON request handler
 #######################
+@app.route("/_ajaxcheck")
+def ajaxcheck():
+    text = flask.request.args.get("text", type=str)
+    jumble = flask.session["jumble"]
+    matches = flask.session.get("matches", [])  # Default to empty list
 
+    # Is it good?
+    in_jumble = LetterBag(jumble).contains(text)
+    matched = WORDS.has(text)
+    message = {"matches": matches, "alert": "", "found": False}
+    # Respond appropriately
+    if matched and in_jumble and not (text in matches):
+        # Cool, they found a new word
+        matches.append(text)
+        flask.session["matches"] = matches
+        message["found"] = True
+    elif text in matches:
+        message["alert"] = "You already found {}".format(text)
+    elif not matched and text:
+        message["alert"] = "{} isn't in the list of words".format(text)
+    elif not in_jumble and text:
+        message["alert"] = '"{}" can\'t be made from the letters {}'.format(text, jumble)
+    elif text:
+        app.logger.debug("This case shouldn't happen!")
+        assert False  # Raises AssertionError
+
+
+    if len(matches) >= flask.session["target_count"]:
+        message["complete"] = True
+    else:
+        message["complete"] = False
+    return flask.jsonify(result=message)
 
 @app.route("/_check", methods=["POST"])
 def check():
